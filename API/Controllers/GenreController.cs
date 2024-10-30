@@ -76,6 +76,38 @@ namespace API.Controllers
             return NoContent();
         }
 
+        [HttpPut("update")]
+        public IActionResult Update(GenreAddEditDto model)
+        { 
+            var fetchedGenre = _db.Genres.Find(model.Id);
+            if (fetchedGenre == null)
+            {
+                return NotFound();
+            }
+
+            if (GenreNameExists(model.Name))
+            {
+                return BadRequest("Genre name should be unique");
+            }
+
+            fetchedGenre.Name = model.Name.ToLower();
+            _db.SaveChanges();
+
+            return NoContent();
+        }
+
+        [HttpDelete("delete/{id}")]
+        public IActionResult Delete(int id) 
+        { 
+            var fetchObj = _db.Genres.Find(id);
+            if (fetchObj == null) return NotFound();
+
+            _db.Genres.Remove(fetchObj);
+            _db.SaveChanges();
+
+            return NoContent();
+        }
+
         private bool GenreNameExists(string name)
         {
             var fetchedGenre = _db.Genres.FirstOrDefault(x => x.Name.ToLower() == name.ToLower());
